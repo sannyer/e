@@ -4,19 +4,19 @@ declare(strict_types=1);
 
 namespace App\DataObjects;
 
-use DateTime;
+use DateTimeImmutable;
 use DateTimeZone;
 use JsonSerializable;
 use InvalidArgumentException;
 
 final class SubmitDateTime implements JsonSerializable
 {
-  private DateTime $dateTime;
+  private DateTimeImmutable $dateTime;
 
   public function __construct(string $dateTimeString)
   {
     try {
-      $this->dateTime = new DateTime($dateTimeString, new DateTimeZone(config('emarsys.timezone')));
+      $this->dateTime = new DateTimeImmutable($dateTimeString, new DateTimeZone(config('app.timezone')));
       $this->dateTime->setTime(
         (int)$this->dateTime->format('H'),
         (int)$this->dateTime->format('i'),
@@ -48,7 +48,7 @@ final class SubmitDateTime implements JsonSerializable
     }
   }
 
-  public function getDateTime(): DateTime
+  public function getDateTime(): DateTimeImmutable
   {
     return $this->dateTime;
   }

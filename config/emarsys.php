@@ -24,13 +24,4 @@ return [
     */
     'working_days' => env('WORKING_DAYS', '1,2,3,4,5'),
 
-    /*
-    |--------------------------------------------------------------------------
-    | Timezone
-    |--------------------------------------------------------------------------
-    |
-    | Define the timezone for date calculations.
-    |
-    */
-    'timezone' => env('TIMEZONE', 'UTC'),
 ];

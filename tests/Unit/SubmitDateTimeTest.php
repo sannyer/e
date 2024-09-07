@@ -22,13 +22,13 @@ class SubmitDateTimeTest extends TestCase
     $this->originalConfig = [
       'working_hours_start' => config('emarsys.working_hours_start'),
       'working_hours_end' => config('emarsys.working_hours_end'),
-      'timezone' => config('emarsys.timezone'),
+      'timezone' => config('app.timezone'),
     ];
 
     // Set default test configuration
     Config::set('emarsys.working_hours_start', '09:00');
     Config::set('emarsys.working_hours_end', '17:00');
-    Config::set('emarsys.timezone', 'Europe/Budapest');
+    Config::set('app.timezone', 'Europe/Budapest');
   }
 
   protected function tearDown(): void
@@ -36,7 +36,7 @@ class SubmitDateTimeTest extends TestCase
     // Reset to original configuration
     Config::set('emarsys.working_hours_start', $this->originalConfig['working_hours_start']);
     Config::set('emarsys.working_hours_end', $this->originalConfig['working_hours_end']);
-    Config::set('emarsys.timezone', $this->originalConfig['timezone']);
+    Config::set('app.timezone', $this->originalConfig['timezone']);
 
     parent::tearDown();
   }
@@ -63,11 +63,11 @@ class SubmitDateTimeTest extends TestCase
     new SubmitDateTime('2023-05-15 18:00:00');
   }
 
-  // test getDateTime returns a DateTime object
+  // test getDateTime returns a DateTimeImmutable object
   public function testGetDateTime()
   {
     $dateTime = new SubmitDateTime('2023-05-15 10:30:00');
-    $this->assertInstanceOf(\DateTime::class, $dateTime->getDateTime());
+    $this->assertInstanceOf(\DateTimeImmutable::class, $dateTime->getDateTime());
   }
 
   // test __toString returns a string in the correct format
@@ -112,9 +112,9 @@ class SubmitDateTimeTest extends TestCase
   // test different timezones return different timestamps with the same time
   public function testDifferentTimezones()
   {
-    Config::set('emarsys.timezone', 'America/New_York');
+    Config::set('app.timezone', 'America/New_York');
     $dateTime1 = new SubmitDateTime('2023-05-15 10:30:00');
-    Config::set('emarsys.timezone', 'Europe/Budapest');
+    Config::set('app.timezone', 'Europe/Budapest');
     $dateTime2 = new SubmitDateTime('2023-05-15 10:30:00');
 
     $this->assertNotEquals($dateTime1->getDateTime(), $dateTime2->getDateTime());
@@ -124,7 +124,7 @@ class SubmitDateTimeTest extends TestCase
   public function testDaylightSavingTimeTransition()
   {
     // Set a timezone that observes DST
-    Config::set('emarsys.timezone', 'America/New_York');
+    Config::set('app.timezone', 'America/New_York');
 
     // Test date before DST transition (2023-03-12 is when DST starts in the US)
     $beforeDST = new SubmitDateTime('2023-03-11 10:30:00');
