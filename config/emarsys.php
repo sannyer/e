@@ -22,6 +22,7 @@ return [
     | 1 (for Monday) through 7 (for Sunday).
     |
     */
-    'working_days' => env('WORKING_DAYS', '1,2,3,4,5'),
+    // make array of numbers, from comma separated string, remove empty values
+    'working_days' => array_filter(array_map('intval', explode(',', env('WORKING_DAYS', '1,2,3,4,5')))),
 
 ];

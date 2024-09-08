@@ -26,6 +26,11 @@ final class SubmitDateTime implements JsonSerializable
     } catch (\Exception $e) {
       throw new InvalidArgumentException("Invalid submit date format: " . $e->getMessage());
     }
+    $this->config = [
+      'working_hours_start' => config('emarsys.working_hours_start'),
+      'working_hours_end' => config('emarsys.working_hours_end'),
+      'working_days' => config('emarsys.working_days'),
+    ];
   }
 
   private function validate(): void
@@ -45,6 +50,10 @@ final class SubmitDateTime implements JsonSerializable
       throw new InvalidArgumentException(
         "Submit time must be within working hours ({$workingHoursStart} - {$workingHoursEnd})"
       );
+    }
+    $workingDays = config('emarsys.working_days');
+    if (!in_array($this->dateTime->format('N'), $workingDays)) {
+      throw new InvalidArgumentException("Submit date must be a working day");
     }
   }
 

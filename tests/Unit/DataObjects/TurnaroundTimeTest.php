@@ -8,13 +8,28 @@ use App\DataObjects\TurnaroundTime;
 use InvalidArgumentException;
 use Tests\TestCase;
 use TypeError;
+use Illuminate\Support\Facades\Log;
 
 class TurnaroundTimeTest extends TestCase
 {
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+    }
+
     // Tests creation with a valid integer input
     public function testValidIntegerInput()
     {
         $turnaroundTime = new TurnaroundTime(120);
+        $this->assertInstanceOf(TurnaroundTime::class, $turnaroundTime);
+        $this->assertEquals(120, $turnaroundTime->getMinutes());
+    }
+
+    // test integer input coming as string
+    public function testValidIntegerInputString()
+    {
+        $turnaroundTime = new TurnaroundTime('120');
         $this->assertInstanceOf(TurnaroundTime::class, $turnaroundTime);
         $this->assertEquals(120, $turnaroundTime->getMinutes());
     }

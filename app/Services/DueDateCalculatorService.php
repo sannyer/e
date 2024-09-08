@@ -7,7 +7,6 @@ namespace App\Services;
 use App\DataObjects\SubmitDateTime;
 use App\DataObjects\TurnaroundTime;
 use DateTimeImmutable;
-use DateTime;
 
 
 class DueDateCalculatorService
@@ -21,55 +20,72 @@ class DueDateCalculatorService
   {
     $this->workingHoursStart = config('emarsys.working_hours_start');
     $this->workingHoursEnd = config('emarsys.working_hours_end');
-    $this->workingDays = array_map('intval', explode(',', config('emarsys.working_days')));
+    $this->workingDays = config('emarsys.working_days');
   }
 
+  /**
+   * Calculate the due date based on the submit date and time and the turnaround time.
+   *
+   * @param SubmitDateTime $submitDateTime
+   * @param TurnaroundTime $turnaroundTime
+   * @return SubmitDateTime // the return type guarantees that the returned value is a valid time in working hours on a working day
+   */
   public function calculateDueDate(SubmitDateTime $submitDateTime, TurnaroundTime $turnaroundTime): SubmitDateTime
   {
-    $cursor = new DateTime($submitDateTime->getDateTime()->format('Y-m-d H:i:s'));
-    $minutesToAdd = $turnaroundTime->getMinutes();
+    $dateTimeStart = new DateTimeImmutable($this->workingHoursStart);
+    $dateTimeEnd = new DateTimeImmutable($this->workingHoursEnd);
+    $startHour = (int)$dateTimeStart->format('H');
+    $startMinute = (int)$dateTimeStart->format('i');
+    $endHour = (int)$dateTimeEnd->format('H');
+    $endMinute = (int)$dateTimeEnd->format('i');
 
-    $dayWorkingMinutes = $this->calculateWorkdayMinutes();
+    $minutesLeft = $turnaroundTime->getMinutes();
 
-    while ($minutesToAdd > 0) {
+    // this will move gradually from starting point to the due date
+    $cursor = $submitDateTime->getDateTime();
+
+    // we can safely assume that the starting point is a working day on a working hour
+    // because otherwise the inputs would've resulted in an exception
+    while ($minutesLeft > 0 || !$this->isWorkingDay($cursor)) {
       if ($this->isWorkingDay($cursor)) {
-        if ($this->isWorkingHour($cursor)) {
-          $minutesToAdd -= $this->minutesDiff($cursor, $cursor->setTime(intval($this->workingHoursEnd)));
+        $dayEnd = $cursor->setTime($endHour, $endMinute);
+        $minutesToDayEnd = $this->minutesDiff($cursor, $dayEnd);
+        if ($minutesLeft < $minutesToDayEnd) {
+          $cursor = $cursor->modify('+ ' . $minutesLeft . ' minutes');
+          $minutesLeft = 0;
+          break;
         }
+        $minutesLeft -= $minutesToDayEnd;
       }
-      while (!$this->isWorkingDay($cursor)) {
-        $cursor->modify('+1 day');
-      }
-
-
-      $minutesToAdd -= $dayWorkingMinutes;
+      $cursor = $cursor->modify('+ 1 day')->setTime($startHour, $startMinute);
     }
 
-    return new SubmitDateTime((string)$cursor);
+    $cursorDateTime = $cursor->format('Y-m-d H:i:s');
+
+    return new SubmitDateTime($cursorDateTime);
   }
 
-  protected function isWorkingDay(DateTime|DateTimeImmutable $date): bool
+  protected function isWorkingDay(DateTimeImmutable $date): bool
   {
     return in_array($date->format('N'), $this->workingDays);
   }
 
-  protected function isWorkingHour(DateTime|DateTimeImmutable $date): bool
+  protected function isWorkingHour(DateTimeImmutable $date): bool
   {
     return $date->format('H:i') >= $this->workingHoursStart && $date->format('H:i') <= $this->workingHoursEnd;
   }
 
-  protected function calculateWorkdayMinutes(): int
+  public function calculateWorkdayMinutes(): int
   {
     $start = new DateTimeImmutable($this->workingHoursStart);
     $end = new DateTimeImmutable($this->workingHoursEnd);
     return $this->minutesDiff($start, $end);
   }
 
-  protected function minutesDiff(DateTime|DateTimeImmutable $start, DateTime|DateTimeImmutable $end): int
+  protected function minutesDiff(DateTimeImmutable $start, DateTimeImmutable $end): int
   {
-    $startTs = new DateTimeImmutable($start->format('Y-m-d H:i:s'));
-    $endTs = new DateTimeImmutable($end->format('Y-m-d H:i:s'));
-    $secDiff = $endTs->getTimestamp() - $startTs->getTimestamp();
-    return (int) floor($secDiff / 60);
+    $secDiff = $end->getTimestamp() - $start->getTimestamp();
+    $minDiff = (int) floor($secDiff / 60);
+    return $minDiff;
   }
 }

@@ -19,8 +19,8 @@ final class TurnaroundTime implements JsonSerializable
 
   private function parseInput(string|int $turnaroundTime): int
   {
-    if (is_int($turnaroundTime)) {
-      return $turnaroundTime; // the integer is considered as minutes
+    if (is_numeric($turnaroundTime)) {
+      return (int)$turnaroundTime; // the integer is considered as minutes
     }
 
     // if HH:MM format, convert to minutes

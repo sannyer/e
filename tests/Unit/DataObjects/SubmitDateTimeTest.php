@@ -8,6 +8,7 @@ use App\DataObjects\SubmitDateTime;
 use Tests\TestCase;
 use InvalidArgumentException;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Log;
 
 class SubmitDateTimeTest extends TestCase
 {
@@ -126,11 +127,11 @@ class SubmitDateTimeTest extends TestCase
     // Set a timezone that observes DST
     Config::set('app.timezone', 'America/New_York');
 
-    // Test date before DST transition (2023-03-12 is when DST starts in the US)
-    $beforeDST = new SubmitDateTime('2023-03-11 10:30:00');
-
-    // Test date after DST transition
-    $afterDST = new SubmitDateTime('2023-03-12 10:30:00');
+    // Test date before DST transition (2023-03-12 is when DST starts in the US).
+    // Must use a 3-day (fri-mon) interval, because DST is always on weekend
+    // and picking weekend dates would result validation error
+    $beforeDST = new SubmitDateTime('2023-03-10 10:30:00');
+    $afterDST = new SubmitDateTime('2023-03-13 10:30:00');
 
     // Ensure that both dates are created successfully
     $this->assertInstanceOf(SubmitDateTime::class, $beforeDST);
@@ -141,11 +142,11 @@ class SubmitDateTimeTest extends TestCase
     $timeDifference = $afterDST->getDateTime()->getTimestamp() - $beforeDST->getDateTime()->getTimestamp();
     $hour = 60 * 60;
     $day = 24 * $hour;
-    $this->assertEquals(1 * $day - 1 * $hour, $timeDifference, "The time difference should be 23 hours due to DST transition");
+    $this->assertEquals(3 * $day - 1 * $hour, $timeDifference, "The time difference should be 23 hours due to DST transition");
 
     // Verify that the string representation is correct for both dates
-    $this->assertEquals('2023-03-11T15:30:00Z', (string)$beforeDST);
-    $this->assertEquals('2023-03-12T14:30:00Z', (string)$afterDST);
+    $this->assertEquals('2023-03-10T15:30:00Z', (string)$beforeDST);
+    $this->assertEquals('2023-03-13T14:30:00Z', (string)$afterDST);
   }
 
   // test leap year
@@ -155,10 +156,10 @@ class SubmitDateTimeTest extends TestCase
     $dateTime = new SubmitDateTime('2024-02-29 10:30:00');
     $this->assertInstanceOf(SubmitDateTime::class, $dateTime);
     $this->assertEquals('2024-02-29', (string)$dateTime->getDateTime()->format('Y-m-d'));
-    // try with different year and expect resulting March 1st
-    $dateTime = new SubmitDateTime('2025-02-29 10:30:00');
+    // try with different year and expect resulting March 1st (where not weekend)
+    $dateTime = new SubmitDateTime('2027-02-29 10:30:00');
     $this->assertInstanceOf(SubmitDateTime::class, $dateTime);
-    $this->assertEquals('2025-03-01', (string)$dateTime->getDateTime()->format('Y-m-d'));
+    $this->assertEquals('2027-03-01', (string)$dateTime->getDateTime()->format('Y-m-d'));
   }
 
   // test invalid working hours configuration
@@ -168,5 +169,13 @@ class SubmitDateTimeTest extends TestCase
     Config::set('emarsys.working_hours_end', '09:00');
     $this->expectException(InvalidArgumentException::class);
     new SubmitDateTime('2023-05-15 10:30:00');
+  }
+
+  // test submit time on weekend
+  public function testSubmitTimeOnWeekend()
+  {
+    $this->expectException(InvalidArgumentException::class);
+    $this->expectExceptionMessage('Submit date must be a working day');
+    new SubmitDateTime('2023-05-14 10:30:00'); // This is a Sunday
   }
 }
