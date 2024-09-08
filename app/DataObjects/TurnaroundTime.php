@@ -11,16 +11,16 @@ final class TurnaroundTime implements JsonSerializable
 {
   private int $minutes;
 
-  public function __construct(string|int $turnaroundTime)
+  public function __construct(string|int|float $turnaroundTime)
   {
     $this->minutes = $this->parseInput($turnaroundTime);
     $this->validate();
   }
 
-  private function parseInput(string|int $turnaroundTime): int
+  private function parseInput(string|int|float $turnaroundTime): int
   {
     if (is_numeric($turnaroundTime)) {
-      return (int)$turnaroundTime; // the integer is considered as minutes
+      return (int)($turnaroundTime * 60); // the number is considered as hours
     }
 
     // if HH:MM format, convert to minutes

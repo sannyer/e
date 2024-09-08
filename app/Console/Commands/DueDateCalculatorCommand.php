@@ -22,8 +22,9 @@ class DueDateCalculatorCommand extends Command
 
     public function handle()
     {
-        $this->info('Welcome to the Due Date Calculator');
+        $this->line('Welcome to the Due Date Calculator');
 
+        $this->displayParameterExplanation();
         $this->displayConfiguration();
 
         $submitDateTime = new SubmitDateTime($this->argument('submitDateTime'));
@@ -39,23 +40,33 @@ class DueDateCalculatorCommand extends Command
     // make a method to display the current configuration
     private function displayConfiguration()
     {
-        $this->info('Working hours start: ' . config('emarsys.working_hours_start'));
-        $this->info('Working hours end: ' . config('emarsys.working_hours_end'));
-        $this->info('Working days: ' . join(', ', config('emarsys.working_days')));
-        $this->info('Timezone: ' . config('app.timezone'));
+        $this->line('Working hours start: ' . config('emarsys.working_hours_start'));
+        $this->line('Working hours end: ' . config('emarsys.working_hours_end'));
+        $this->line('Working days: ' . join(', ', config('emarsys.working_days')));
+        $this->line('Timezone: ' . config('app.timezone'));
         $workdayMinutes = $this->calculator->calculateWorkdayMinutes();
-        $this->info('Working hours per day: ' . ($workdayMinutes / 60));
+        $this->line('Working hours per day: ' . ($workdayMinutes / 60));
+    }
+
+    private function displayParameterExplanation()
+    {
+        $this->line("\nParameter Explanation:");
+        $this->line(' » submitDateTime: The date and time when the issue was submitted (format: "YYYY-MM-DD HH:mm")');
+        $this->line(' » turnaroundTime: The working hours needed to resolve the issue (format: HH or HH:mm)');
+        $this->line(' (mind the quotes if contains spaces)');
+        $this->line('');
     }
 
     private function displayInputs(SubmitDateTime $submitDateTime, TurnaroundTime $turnaroundTime)
     {
-        $this->info("\nInputs:");
-        $this->info(' » Submit datetime: ' . $submitDateTime->getDateTime()->format('Y-m-d H:i (l)'));
-        $this->info(' » Turnaround time: ' . $turnaroundTime . ' (' . $turnaroundTime->getMinutes() . ' minutes)');
+        $this->warn("\nInputs:");
+        $this->warn(' » Submit datetime: ' . $submitDateTime->getDateTime()->format('Y-m-d H:i (l)'));
+        $this->warn(' » Turnaround time: ' . $turnaroundTime . ' (' . $turnaroundTime->getMinutes() . ' minutes)');
     }
 
     private function displayDueDate($dueDate)
     {
         $this->info("\nDue datetime: " . $dueDate->getDateTime()->format('Y-m-d H:i (l)'));
+        $this->info("ISO: " . $dueDate);
     }
 }
