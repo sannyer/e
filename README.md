@@ -18,48 +18,63 @@ The Due Date Calculator is a tool designed to calculate the resolution date and 
 
 ## Installation
 
-1. Ensure you have PHP 8.1 or higher and composer installed.
+1. Ensure you have Docker Desktop installed on your system. This installer will arrange the necessary environment inside the container for the application to run. In case you already have a container called `calculator` running, rename it in the docker-compose.yaml file.
 
 2. Clone the repository:
-   ```
+   ```sh
    git clone git@github.com:sannyer/e.git
    ```
 
 3. Navigate to the project directory:
-   ```
+   ```sh
    cd e
    ```
 
-4. Install the dependencies:
+4. Build and start the container in the background, then open a shell inside the container.
+   ```sh
+   docker compose up -d
+   docker compose exec calculator sh
    ```
+   Subsequent commands will be assumed to be run in that shell.
+
+5. Install the dependencies:
+   ```sh
    composer install
    ```
 
-5. Copy the example environment file:
-   ```
+6. Make a copy of the example environment file:
+   ```sh
    cp .env.example .env
    ```
 
-6. Generate application key:
-   ```
+7. Generate application key:
+   ```sh
    php artisan key:generate
    ```
 
-7. The calculator is now ready to use.
+8. The calculator is now ready to use.
 
 ## Usage
 
-```
+```sh
 php artisan calculator "2024-05-15 10:30:00" "16:00"
 php artisan calculator "2024-05-15 10:30:00" 5
 ```
 
 ## Testing
 
-```
+```sh
 php artisan test
 ```
 See [test.log](test.log) for the test results.
+
+## Stopping the Docker Container
+
+When you're finished using the calculator, you can stop the Docker container with the following command:
+
+```sh
+docker compose down
+```
 
 ## Technologies Used
 - PHP 8.1+

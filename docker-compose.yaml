@@ -1,0 +1,10 @@
+services:
+  calculator:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: calculator
+    container_name: calculator
+    volumes:
+      - ./:/var/www/html
+    working_dir: /var/www/html
