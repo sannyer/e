@@ -25,9 +25,10 @@ The Due Date Calculator is a tool designed to calculate the resolution date and 
    git clone git@github.com:sannyer/e.git
    ```
 
-3. Navigate to the project directory:
+3. Navigate to the project directory, and checkout the dockerized branch:
    ```sh
    cd e
+   git checkout add-docker
    ```
 
 4. Build and start the container in the background, then open a shell inside the container.
