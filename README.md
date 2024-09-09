@@ -35,12 +35,17 @@ The Due Date Calculator is a tool designed to calculate the resolution date and 
    composer install
    ```
 
-5. Generate application key:
+5. Copy the example environment file:
+   ```
+   cp .env.example .env
+   ```
+
+6. Generate application key:
    ```
    php artisan key:generate
    ```
 
-6. The calculator is now ready to use.
+7. The calculator is now ready to use.
 
 ## Usage
 
@@ -54,6 +59,7 @@ php artisan calculator "2024-05-15 10:30:00" 5
 ```
 php artisan test
 ```
+See [test.log](test.log) for the test results.
 
 ## Technologies Used
 - PHP 8.1+

@@ -1,0 +1,51 @@
+   PASS  Tests\Unit\DataObjects\SubmitDateTimeTest
+  ✓ valid submit date time                                                                                                                                                0.17s
+  ✓ invalid date format                                                                                                                                                   0.01s
+  ✓ submit time outside working hours                                                                                                                                     0.01s
+  ✓ get date time                                                                                                                                                         0.01s
+  ✓ to string                                                                                                                                                             0.01s
+  ✓ equals                                                                                                                                                                0.01s
+  ✓ json serialize                                                                                                                                                        0.01s
+  ✓ lower boundary of working hours                                                                                                                                       0.01s
+  ✓ upper boundary of working hours                                                                                                                                       0.01s
+  ✓ different timezones                                                                                                                                                   0.01s
+  ✓ daylight saving time transition                                                                                                                                       0.01s
+  ✓ leap year                                                                                                                                                             0.01s
+  ✓ invalid working hours configuration                                                                                                                                   0.01s
+  ✓ submit time on weekend                                                                                                                                                0.01s
+
+   PASS  Tests\Unit\DataObjects\TurnaroundTimeTest
+  ✓ valid integer input                                                                                                                                                   0.03s
+  ✓ valid float input                                                                                                                                                     0.01s
+  ✓ valid integer input string                                                                                                                                            0.01s
+  ✓ valid float input string                                                                                                                                              0.01s
+  ✓ valid string input h h m m                                                                                                                                            0.01s
+  ✓ invalid string input                                                                                                                                                  0.01s
+  ✓ negative input                                                                                                                                                        0.01s
+  ✓ zero input                                                                                                                                                            0.01s
+  ✓ get hours                                                                                                                                                             0.01s
+  ✓ to string                                                                                                                                                             0.01s
+  ✓ equals                                                                                                                                                                0.01s
+  ✓ json serialize                                                                                                                                                        0.01s
+  ✓ large input                                                                                                                                                           0.01s
+
+   PASS  Tests\Unit\ExampleTest
+  ✓ that true is true                                                                                                                                                     0.01s
+
+   PASS  Tests\Unit\Services\DueDateCalculatorServiceTest
+  ✓ calculate due date same day                                                                                                                                           0.01s
+  ✓ calculate due date next day                                                                                                                                           0.01s
+  ✓ calculate due date over weekend                                                                                                                                       0.01s
+  ✓ calculate due date long turnaround time                                                                                                                               0.01s
+  ✓ calculate due date start of working hours                                                                                                                             0.01s
+  ✓ calculate due date end of working hours                                                                                                                               0.01s
+  ✓ calculate due date with different working hours                                                                                                                       0.01s
+  ✓ calculate due date with different working days                                                                                                                        0.01s
+  ✓ calculate due date with different timezone                                                                                                                            0.01s
+  ✓ calculate due date over daylight saving transition                                                                                                                    0.01s
+
+   PASS  Tests\Feature\ExampleTest
+  ✓ the application returns a successful response                                                                                                                         0.29s
+
+  Tests:    39 passed (59 assertions)
+  Duration: 0.93s
