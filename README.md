@@ -12,6 +12,7 @@ The Due Date Calculator is a tool designed to calculate the resolution date and 
 
 - In terms of not using third-party libraries, I only used PHP 8.1 built-in libraries (DateTimeImmutable), and didn't do low-level date calculations myself, since it's not the focus of the assignment and no framework would expect me to do that in 2024.
 - I wrote tests subsequently, I'm not experienced with TDD
+- If you want to change the working hours, or the working days of the week, feel free to edit the .env file.
 
 ## Note
 - Against what the homework ordered, I added a CLI just because it eased the development process.
