@@ -13,6 +13,8 @@ final class SubmitDateTime implements JsonSerializable
 {
   private DateTimeImmutable $dateTime;
 
+  const REGEX_TIME = '/^[0-9]+:[0-9]+$/';
+
   public function __construct(string $dateTimeString)
   {
     try {
@@ -26,24 +28,31 @@ final class SubmitDateTime implements JsonSerializable
     } catch (\Exception $e) {
       throw new InvalidArgumentException("Invalid submit date format: " . $e->getMessage());
     }
-    $this->config = [
-      'working_hours_start' => config('emarsys.working_hours_start'),
-      'working_hours_end' => config('emarsys.working_hours_end'),
-      'working_days' => config('emarsys.working_days'),
-    ];
   }
 
   private function validate(): void
   {
+    $this->validateWorkingHoursFormat();
+    $this->validateSubmitTimeWithinWorkingHours();
+    $this->validateSubmitDateIsWorkingDay();
+  }
+
+  private function validateWorkingHoursFormat(): void
+  {
     $workingHoursStart = config('emarsys.working_hours_start');
     $workingHoursEnd = config('emarsys.working_hours_end');
-    // if any is not HH:MM format, throw an exception
     if (
-      !preg_match('/^[0-2][0-9]:[0-5][0-9]$/', $workingHoursStart) ||
-      !preg_match('/^[0-2][0-9]:[0-5][0-9]$/', $workingHoursEnd)
+      !preg_match(self::REGEX_TIME, $workingHoursStart) ||
+      !preg_match(self::REGEX_TIME, $workingHoursEnd)
     ) {
       throw new InvalidArgumentException("Environment variables WORKING_HOURS_START and WORKING_HOURS_END must follow HH:MM format");
     }
+  }
+
+  private function validateSubmitTimeWithinWorkingHours(): void
+  {
+    $workingHoursStart = config('emarsys.working_hours_start');
+    $workingHoursEnd = config('emarsys.working_hours_end');
     $submitTime = $this->dateTime->format('H:i');
 
     if ($submitTime < $workingHoursStart || $submitTime >= $workingHoursEnd) {
@@ -51,11 +60,16 @@ final class SubmitDateTime implements JsonSerializable
         "Submit time must be within working hours ({$workingHoursStart} - {$workingHoursEnd})"
       );
     }
+  }
+
+  private function validateSubmitDateIsWorkingDay(): void
+  {
     $workingDays = config('emarsys.working_days');
     if (!in_array($this->dateTime->format('N'), $workingDays)) {
       throw new InvalidArgumentException("Submit date must be a working day");
     }
   }
+
 
   public function getDateTime(): DateTimeImmutable
   {

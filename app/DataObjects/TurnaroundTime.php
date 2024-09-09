@@ -11,6 +11,8 @@ final class TurnaroundTime implements JsonSerializable
 {
   private int $minutes;
 
+  const REGEX_TIME = '/^[0-9]+:[0-9]+$/';
+
   public function __construct(string|int|float $turnaroundTime)
   {
     $this->minutes = $this->parseInput($turnaroundTime);
@@ -24,7 +26,7 @@ final class TurnaroundTime implements JsonSerializable
     }
 
     // if HH:MM format, convert to minutes
-    if (preg_match('/^[0-9]+:[0-9]+$/', $turnaroundTime)) {
+    if (preg_match(self::REGEX_TIME, $turnaroundTime)) {
       list($hours, $minutes) = explode(':', $turnaroundTime);
       return ((int)$hours * 60) + (int)$minutes;
     }

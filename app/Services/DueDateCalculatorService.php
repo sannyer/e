@@ -12,9 +12,9 @@ use DateTimeImmutable;
 class DueDateCalculatorService
 {
 
-  protected string $workingHoursStart;
-  protected string $workingHoursEnd;
-  protected array $workingDays;
+  private string $workingHoursStart;
+  private string $workingHoursEnd;
+  private array $workingDays;
 
   public function __construct()
   {
